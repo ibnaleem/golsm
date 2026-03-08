@@ -27,6 +27,7 @@ func check(e error) {
 
 type WriteAheadLog struct {
 	file         *os.File
+	path         string
 	bufferWriter *bufio.Writer
 	gobEncoder   *gob.Encoder
 }
@@ -42,6 +43,7 @@ func New(path string) *WriteAheadLog {
 
 	return &WriteAheadLog{
 		file: f,
+		path: path,
 		bufferWriter: writer,
 		gobEncoder: encoder,
 	}
