@@ -61,6 +61,9 @@ func (s *SSTable) Write(entries []memtable.Entry) {
 
 	writer := bufio.NewWriter(f)
 
+	currOffset := uint64(0)
+	indexEntries := []IndexEntry{}
+
 	for _, entry := range entries {
 		err := binary.Write(writer, binary.LittleEndian, uint32(len(entry.Key)))
 		check(err)
@@ -75,7 +78,37 @@ func (s *SSTable) Write(entries []memtable.Entry) {
 		check(err)
 
 		s.bloomFilter.Add(entry.Key)
+
+
+		indexEntry := IndexEntry{
+			Key: entry.Key,
+			Offset: currOffset,
+		}
+
+		indexEntries = append(indexEntries, indexEntry)
+
+		currOffset += uint64(8) + uint64(len(entry.Key)) + uint64(len(entry.Value))
 	}
 
 	writer.Flush()
+
+	indexFile, err := os.OpenFile(s.indexFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	check(err)
+
+	defer indexFile.Close()
+
+	indexWriter := bufio.NewWriter(indexFile)
+
+	for _, indexEntry := range indexEntries {
+		err := binary.Write(indexWriter, binary.LittleEndian, uint32(len(indexEntry.Key))) 
+		check(err)
+
+		err = binary.Write(indexWriter, binary.LittleEndian, indexEntry.Key)
+		check(err)
+
+		err = binary.Write(indexWriter, binary.LittleEndian, indexEntry.Offset)
+		check(err)
+	}
+
+	indexWriter.Flush()
 }
