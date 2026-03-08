@@ -33,15 +33,21 @@ func New() *Memtable {
 
 func (m *Memtable) Put(key []byte, value []byte) {
 
-	m.size = len(key) + len(value) + m.size
+	newSize := m.size + len(key) + len(value)
 
 	entry := Entry{
 		Key: key,
 		Value: value,
 	}
 
-	m.tree.ReplaceOrInsert(entry)
+	result := m.tree.ReplaceOrInsert(entry)
 
+	if result == nil {
+		m.size = newSize
+	} else {
+		old := result.(Entry)
+		m.size = newSize - len(old.Key)  - len(old.Value)
+	}
 }
 
 func (m *Memtable) Get(key []byte) []byte {
