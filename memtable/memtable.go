@@ -72,6 +72,7 @@ func (m *Memtable) Delete(key []byte) {
 	if result == nil {
 		return
 	} else {
-		m.size = m.size - len(result.(Entry).Key) - len(result.(Entry).Value)
+		old := result.(Entry)
+		m.size = m.size - len(old.Key) - len(old.Value)
 	}
 }
