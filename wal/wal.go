@@ -34,3 +34,16 @@ func New(path string) *WriteAheadLog {
 	}
 
 }
+
+type Operation string
+
+const (
+    PutOperation Operation = "PUT"
+    DeleteOperation Operation = "DELETE"
+)
+
+type WALRecord struct {
+	Operation Operation
+	Key []byte
+	Value []byte
+}
