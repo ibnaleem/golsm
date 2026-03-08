@@ -6,8 +6,31 @@ import (
 	"encoding/gob"
 )
 
+func check(e error) {
+    if e != nil {
+        panic(e)
+    }
+}
+
 type WriteAheadLog struct {
 	file         *os.File
 	bufferWriter *bufio.Writer
 	gobEncoder   *gob.Encoder
+}
+
+func New(path string) *WriteAheadLog {
+	
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	check(err)
+
+	writer := bufio.NewWriter(f)
+
+	encoder := gob.NewEncoder(writer)
+
+	return &WriteAheadLog{
+		file: f,
+		bufferWriter: writer,
+		gobEncoder: encoder,
+	}
+
 }
