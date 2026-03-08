@@ -43,3 +43,16 @@ func (m *Memtable) Put(key []byte, value []byte) {
 	m.tree.ReplaceOrInsert(entry)
 
 }
+
+func (m *Memtable) Get(key []byte) []byte {
+
+	entry := Entry{Key: key, Value: nil}
+
+	result := m.tree.Get(entry)
+
+	if result == nil {
+		return nil
+	} else {
+		return result.(Entry).Value
+	}
+}
