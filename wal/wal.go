@@ -1,9 +1,10 @@
 package wal
 
 import (
-	"os"
 	"bufio"
 	"encoding/gob"
+	"io"
+	"os"
 )
 
 type Operation string
@@ -57,4 +58,30 @@ func (w *WriteAheadLog) Write(record WALRecord) {
 
 	w.bufferWriter.Flush()
 
+}
+
+func (w *WriteAheadLog) Recover() []WALRecord {
+
+	f, err := os.OpenFile(w.path, os.O_RDONLY, 0644)
+	check(err)
+
+	buffer := bufio.NewReader(f)
+	decoder := gob.NewDecoder(buffer)
+
+	record := WALRecord{}
+	records := []WALRecord{}
+
+	for {
+		err := decoder.Decode(&record)
+
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			check(err)
+		} else {
+			records = append(records, record)
+		}
+	}
+
+	return records
 }
