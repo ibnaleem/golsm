@@ -79,21 +79,3 @@ func (s *SSTable) Write(entries []memtable.Entry) {
 
 	writer.Flush()
 }
-
-func (s *SSTable) Read(key []byte) []byte {
-	if (s.bloomFilter.Test(key)) == false {
-		return nil
-	} else {
-
-		f, err := os.OpenFile(s.filepath, os.O_RDONLY, 0644)
-		check(err)
-
-		defer f.Close()
-
-		reader := bufio.NewReader(f)
-
-
-
-
-	}
-}
