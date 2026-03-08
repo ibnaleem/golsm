@@ -4,6 +4,8 @@ import (
 	"os"
 	"time"
 	"bufio"
+	"strings"
+	"path/filepath"
 	"encoding/binary"
 
 	"github.com/bits-and-blooms/bloom"
@@ -17,13 +19,19 @@ func check(e error) {
 }
 
 type SSTable struct {
-	filepath        string
-	timestamp   time.Time
-	bloomFilter *bloom.BloomFilter
+	filepath      string
+	indexFilePath string
+	timestamp     time.Time
+	bloomFilter   *bloom.BloomFilter
 }
 
 func New(path string) *SSTable {
 	now := time.Now()
+	
+	ext       := filepath.Ext(path)
+	base      := strings.TrimSuffix(path, ext)
+	indexFile := base + ".index"
+	
 
 	n := uint(1000000)
 	fp := 0.01 // 1% false positive rate
@@ -32,6 +40,7 @@ func New(path string) *SSTable {
 
 	return &SSTable{
 		filepath: path,
+		indexFilePath: indexFile,
 		timestamp: now,
 		bloomFilter: bf,
 	}
