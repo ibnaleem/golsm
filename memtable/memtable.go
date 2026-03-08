@@ -30,3 +30,16 @@ func New() *Memtable {
         size: 0,
     }
 }
+
+func (m *Memtable) Put(key []byte, value []byte) {
+
+	m.size = len(key) + len(value) + m.size
+
+	entry := Entry{
+		Key: key,
+		Value: value,
+	}
+
+	m.tree.ReplaceOrInsert(entry)
+
+}
