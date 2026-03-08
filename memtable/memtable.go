@@ -6,6 +6,8 @@ import (
 	"github.com/google/btree"
 )
 
+const MAXSIZE = 64 * 1024 * 1024
+
 type Entry struct {
 	Key []byte
 	Value []byte
@@ -75,4 +77,8 @@ func (m *Memtable) Delete(key []byte) {
 		old := result.(Entry)
 		m.size = m.size - len(old.Key) - len(old.Value)
 	}
+}
+
+func (m *Memtable) IsFull() bool {
+	return m.size >= MAXSIZE
 }
