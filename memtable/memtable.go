@@ -23,3 +23,10 @@ type Memtable struct {
 	tree *btree.BTree
 	size int
 }
+
+func New() *Memtable {
+    return &Memtable{
+        tree: btree.New(32),
+        size: 0,
+    }
+}
