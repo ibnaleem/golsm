@@ -17,7 +17,7 @@ func check(e error) {
 }
 
 type SSTable struct {
-	path        string
+	filepath        string
 	timestamp   time.Time
 	bloomFilter *bloom.BloomFilter
 }
@@ -31,7 +31,7 @@ func New(path string) *SSTable {
 	bf := bloom.NewWithEstimates(n, fp)
 
 	return &SSTable{
-		path: path,
+		filepath: path,
 		timestamp: now,
 		bloomFilter: bf,
 	}
@@ -40,7 +40,7 @@ func New(path string) *SSTable {
 
 func (s *SSTable) Write(entries []memtable.Entry) {
 
-	f, err := os.OpenFile(s.path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(s.filepath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	check(err)
 
 	defer f.Close()
