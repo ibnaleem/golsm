@@ -6,6 +6,19 @@ import (
 	"encoding/gob"
 )
 
+type Operation string
+
+const (
+    PutOperation Operation = "PUT"
+    DeleteOperation Operation = "DELETE"
+)
+
+type WALRecord struct {
+	Operation Operation
+	Key []byte
+	Value []byte
+}
+
 func check(e error) {
     if e != nil {
         panic(e)
@@ -33,17 +46,4 @@ func New(path string) *WriteAheadLog {
 		gobEncoder: encoder,
 	}
 
-}
-
-type Operation string
-
-const (
-    PutOperation Operation = "PUT"
-    DeleteOperation Operation = "DELETE"
-)
-
-type WALRecord struct {
-	Operation Operation
-	Key []byte
-	Value []byte
 }
