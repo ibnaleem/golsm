@@ -7,6 +7,7 @@ import (
 )
 
 type SSTable struct {
-	path       string
-	timestamp  time.Time
+	path        string
+	timestamp   time.Time
+	bloomFilter *bloom.BloomFilter
 }
