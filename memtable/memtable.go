@@ -18,3 +18,8 @@ func (e Entry) Less(other btree.Item) bool {
 	return comparison < 0
 
 }
+
+type Memtable struct {
+	tree *btree.BTree
+	size int
+}
