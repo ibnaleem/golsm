@@ -56,3 +56,16 @@ func (m *Memtable) Get(key []byte) []byte {
 		return result.(Entry).Value
 	}
 }
+
+func (m *Memtable) Delete(key []byte) {
+
+	entry := Entry{Key: key, Value: nil}
+
+	result := m.tree.Delete(entry)
+
+	if result == nil {
+		return
+	} else {
+		m.size = m.size - len(result.(Entry).Key) - len(result.(Entry).Value)
+	}
+}
