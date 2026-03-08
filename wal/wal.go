@@ -47,3 +47,12 @@ func New(path string) *WriteAheadLog {
 	}
 
 }
+
+func (w *WriteAheadLog) Write(record WALRecord) {
+	err := w.gobEncoder.Encode(record)
+
+	check(err)
+
+	w.bufferWriter.Flush()
+
+}
