@@ -177,7 +177,37 @@ func (s *SSTable) Read(key []byte) []byte {
 			comparison := bytes.Compare(key, indexEntries[mid].Key)
 
 			if (comparison == 0) {
-				//
+
+				offset := indexEntries[mid].Offset
+
+				f, err := os.OpenFile(s.filepath, os.O_RDONLY, 0644)
+				check(err)
+
+				defer f.Close()
+
+				f.Seek(int64(offset), io.SeekStart)
+
+				buff := bufio.NewReader(f)
+
+				err = binary.Read(buff, binary.LittleEndian, &keyLen)
+				check(err)
+
+				keyBytes := make([]byte, keyLen)
+
+				err = binary.Read(buff, binary.LittleEndian, keyBytes)
+				check(err)
+
+				var valueLen uint32
+
+				err = binary.Read(buff, binary.LittleEndian, &valueLen)
+				check(err)
+
+				valueBytes := make([]byte, valueLen)
+
+				err = binary.Read(buff, binary.LittleEndian, valueBytes)
+				check(err)
+
+				return valueBytes
 			} else if (comparison == -1) {
 				r = mid - 1
 			} else {
@@ -185,4 +215,6 @@ func (s *SSTable) Read(key []byte) []byte {
 			}
 
 		}
+
+		return nil
 }
