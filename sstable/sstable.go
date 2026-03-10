@@ -1,13 +1,14 @@
 package sstable
 
 import (
+	"bufio"
+	"bytes"
+	"encoding/binary"
 	"io"
 	"os"
-	"time"
-	"bufio"
-	"strings"
 	"path/filepath"
-	"encoding/binary"
+	"strings"
+	"time"
 
 	"github.com/bits-and-blooms/bloom"
 	"github.com/ibnaleem/golsm/memtable"
@@ -164,6 +165,24 @@ func (s *SSTable) Read(key []byte) []byte {
 		}
 		
 		indexEntries = append(indexEntries, indexEntry)
-
 	}
+
+	l := 0
+		r := len(indexEntries)
+
+		for l < r {
+
+			mid := (l + r) / 2
+
+			comparison := bytes.Compare(key, indexEntries[mid].Key)
+
+			if (comparison == 0) {
+				//
+			} else if (comparison == -1) {
+				r = mid - 1
+			} else {
+				l = mid + 1
+			}
+
+		}
 }
