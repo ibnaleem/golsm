@@ -1,6 +1,7 @@
 package sstable
 
 import (
+	"io"
 	"os"
 	"time"
 	"bufio"
@@ -111,4 +112,58 @@ func (s *SSTable) Write(entries []memtable.Entry) {
 	}
 
 	indexWriter.Flush()
+}
+
+func (s *SSTable) Read(key []byte) []byte {
+	
+	if (!s.bloomFilter.Test(key)) {
+		return nil
+	}
+		
+	f, err := os.OpenFile(s.indexFilePath, os.O_RDONLY, 0644)
+	check(err)
+
+	defer f.Close()
+
+	buff := bufio.NewReader(f)
+
+	indexEntries := []IndexEntry{}
+	var keyLen uint32
+	var offset uint64
+
+	for {
+		err := binary.Read(buff, binary.LittleEndian, &keyLen)
+
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			check(err)
+		}
+
+		keyBytes := make([]byte, keyLen)
+
+		err = binary.Read(buff, binary.LittleEndian, keyBytes)
+
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			check(err)
+		}
+
+		err = binary.Read(buff, binary.LittleEndian, &offset)
+
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			check(err)
+		}
+	
+		indexEntry := IndexEntry{
+			Key: keyBytes,
+			Offset: offset,
+		}
+		
+		indexEntries = append(indexEntries, indexEntry)
+
+	}
 }
