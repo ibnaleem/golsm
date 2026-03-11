@@ -167,7 +167,7 @@ func (s *SSTable) Read(key []byte) []byte {
 		indexEntries = append(indexEntries, indexEntry)
 	}
 
-	l := 0
+		l := 0
 		r := len(indexEntries)
 
 		for l < r {
