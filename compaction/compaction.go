@@ -32,7 +32,7 @@ func Compact(sstables []*sstable.SSTable, outputPath string) *sstable.SSTable {
 		prevKey := allEntries[i - 1]
 		currKey := allEntries[i]
 
-		if (bytes.Compare(prevKey.Key, currKey.Key) == 0) {
+		if (bytes.Equal(prevKey.Key, currKey.Key)) {
 			continue
 		} else {
 			deduplicatedSlice = append(deduplicatedSlice, entry)
