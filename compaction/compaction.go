@@ -40,4 +40,10 @@ func Compact(sstables []*sstable.SSTable, outputPath string) *sstable.SSTable {
 
 	}
 
+	newTable := sstable.New(outputPath)
+
+	newTable.Write(deduplicatedSlice)
+
+	return newTable
+
 }
