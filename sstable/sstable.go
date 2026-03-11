@@ -218,3 +218,63 @@ func (s *SSTable) Read(key []byte) []byte {
 
 		return nil
 }
+
+func (s *SSTable) ReadAll() []memtable.Entry {
+	
+	f, err := os.OpenFile(s.filepath, os.O_RDONLY, 0644)
+	check(err)
+
+	defer f.Close()
+
+	buff := bufio.NewReader(f)
+
+	entries := []memtable.Entry{}
+
+	for {
+		var keyLen uint32
+
+		err := binary.Read(buff, binary.LittleEndian, &keyLen)
+
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			check(err)
+		}
+
+		keyBytes := make([]byte, keyLen)
+		err = binary.Read(buff, binary.LittleEndian, keyBytes)
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			check(err)
+		}
+
+		var valueLen uint32
+		err = binary.Read(buff, binary.LittleEndian, &valueLen)
+
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			check(err)
+		}
+
+		valueBytes := make([]byte, valueLen)
+		err = binary.Read(buff, binary.LittleEndian, valueBytes)
+
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			check(err)
+		}
+
+		entry := memtable.Entry{
+			Key: keyBytes,
+			Value: valueBytes,
+		}
+
+		entries = append(entries, entry)
+
+	}
+
+	return entries
+}
