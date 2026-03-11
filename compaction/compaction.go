@@ -20,4 +20,24 @@ func Compact(sstables []*sstable.SSTable, outputPath string) *sstable.SSTable {
 		return bytes.Compare(a.Key, b.Key)
 	})
 
+	deduplicatedSlice := []memtable.Entry{}
+
+	for i, entry := range allEntries {
+
+		if (i == 0) {
+			deduplicatedSlice = append(deduplicatedSlice, entry)
+			continue
+		}
+
+		prevKey := allEntries[i - 1]
+		currKey := allEntries[i]
+
+		if (bytes.Compare(prevKey.Key, currKey.Key) == 0) {
+			continue
+		} else {
+			deduplicatedSlice = append(deduplicatedSlice, entry)
+		}
+
+	}
+
 }
